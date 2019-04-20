@@ -1,4 +1,5 @@
 import os
+from ctypes import util
 from ctypes import *
 
 String = c_char_p
@@ -24,3 +25,71 @@ coreclr_create_delegate.restype = c_int
 coreclr_execute_assembly = libcoreclr.coreclr_execute_assembly
 coreclr_execute_assembly.argtypes = [POINTER(None), c_uint, c_int, POINTER(POINTER(c_char)), String, POINTER(c_uint)]
 coreclr_execute_assembly.restype = c_int
+
+class NetCoreError(Exception):
+    def __init__(self, rc, msg):
+        self.rc = rc
+        self.msg = msg
+    def __repr__(self):
+        return "RC={0} MSG={1}".format(self.rc, self.msg)
+
+class NetCore:
+    def __init__(self, app_path, appDomain="pythonhost"):
+        self.libc = cdll.LoadLibrary(util.find_library('c'))
+        tpa = []
+        for fname in os.listdir(coredlltop):
+            fqname = os.path.join(coredlltop, fname)
+            if not os.path.isfile(fqname) or 'dll' != fname.split('.')[-1]:
+                continue
+            tpa.append(fqname)
+        tpa = ':'.join(tpa)
+
+        self.property_keys = (
+            b"APP_PATHS",
+            b"TRUSTED_PLATFORM_ASSEMBLIES",
+        )
+        self.property_values = (
+            app_path.encode('utf-8'),
+            tpa.encode('utf-8'),
+        )
+
+        b = c_char_p * len(self.property_keys)
+        self.cproperty_keys = b(*self.property_keys)
+        self.cproperty_values = b(*self.property_values)
+
+        self.coreclr_handle = c_void_p()
+        self.domain_id = c_uint()
+
+        ret = coreclr_initialize(
+            app_path.encode('utf-8'),     # exePath
+            appDomain.encode('utf-8'),    # appDomainFriendlyName
+            len(self.property_values),    # propertyCount
+            self.cproperty_keys,          # propertyKeys
+            self.cproperty_values,        # propertyValues
+            byref(self.coreclr_handle),   # hostHandle
+            byref(self.domain_id)         # domainId
+        )
+        if ret < 0:
+            raise NetCoreError(ret, "Failed to initialize coreclr.")
+
+    def close(self):
+        coreclr_shutdown(
+            self.coreclr_handle,
+            self.domain_id
+        )
+        del self.domain_id
+        del self.coreclr_handle
+        del self.cproperty_values
+        del self.cproperty_keys
+
+    def bind(self, dllname, classname, procname, procptr):
+        ret = coreclr_create_delegate(
+            self.coreclr_handle,
+            self.domain_id,
+            dllname.encode('utf-8'),
+            classname.encode('utf-8'),
+            procname.encode('utf-8'),
+            procptr
+        )
+        if ret < 0:
+            raise NetCoreError(ret, "Failed to create delegate.")

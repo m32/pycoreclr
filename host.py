@@ -1,76 +1,51 @@
 #!/usr/bin/env python3
 import os
-import ctypes, ctypes.util
 import coreclr
+import ctypes
 
-def main():
-    libc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('c'))
-    tpa = []
-    for fname in os.listdir(coreclr.coredlltop):
-        fqname = os.path.join(coreclr.coredlltop, fname)
-        if not os.path.isfile(fqname) or 'dll' != fname.split('.')[-1]:
-            continue
-        tpa.append(fqname)
-    tpa = ':'.join(tpa)
-    app_path = os.getcwd()
-
-    property_keys = (
-        b"APP_PATHS",
-        b"TRUSTED_PLATFORM_ASSEMBLIES",
-    )
-    property_values = (
-        app_path.encode('utf-8'),
-        tpa.encode('utf-8'),
-    )
-
-    b = ctypes.c_char_p * len(property_keys)
-    cproperty_keys = b(*property_keys)
-    cproperty_values = b(*property_values)
-
-    coreclr_handle = ctypes.c_void_p()
-    domain_id = ctypes.c_uint()
-
-    print("Initializing CoreCLR...")
-    ret = coreclr.coreclr_initialize(
-        app_path.encode('utf-8'),       # exePath
-        b"host",                        # appDomainFriendlyName
-        len(property_values),           # propertyCount
-        cproperty_keys,                 # propertyKeys
-        cproperty_values,               # propertyValues
-        ctypes.byref(coreclr_handle),   # hostHandle
-        ctypes.byref(domain_id)         # domainId
-    )
-    if ret < 0:
-        print("failed to initialize coreclr. cerr = ", ret)
-        return
-
-    proc = ctypes.CFUNCTYPE(ctypes.c_char_p)()
+def demo0(clr):
     # Once CoreCLR is initialized, bind to the delegate
-    print("Creating delegate...")
-    ret = coreclr.coreclr_create_delegate(
-        coreclr_handle,
-        domain_id,
-        b"manlib",
-        b"ManLib",
-        b"Bootstrap",
+    proc = ctypes.CFUNCTYPE(ctypes.c_char_p)()
+    clr.bind(
+        "manlib",
+        "ManLib",
+        "Bootstrap",
         ctypes.byref(proc)
     )
-    if ret < 0:
-        print("couldn't create delegate. err = ", ret)
-        return
-
     # Call the delegate
     print("Calling ManLib::Bootstrap() through delegate...")
     msg = proc()
     print("ManLib::Bootstrap() returned ", msg)
-    #libc.free(msg)  # returned string need to be free-ed but in python causes coredump
+    #clr.libc.free(msg)  # returned string need to be free-ed but in python causes coredump
     del msg
 
-    coreclr.coreclr_shutdown(
-        coreclr_handle,
-        domain_id
+def demo1(clr):
+    def cb(i, l, s, f, d):
+        print('callback in python', i, l, s, f, d)
+        return True
+    # Once CoreCLR is initialized, bind to the delegate
+    tcb = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.c_long, ctypes.c_char_p, ctypes.c_float, ctypes.c_double)
+    proc = ctypes.CFUNCTYPE(ctypes.c_char_p, tcb)()
+    clr.bind(
+        "manlib",
+        "ManLib",
+        "BootstrapCB",
+        ctypes.byref(proc)
     )
-    del coreclr_handle, domain_id
-    del cproperty_keys, cproperty_values
+    # Call the delegate
+    print("Calling ManLib::BootstrapCB() through delegate...")
+    msg = proc(tcb(cb))
+    print("ManLib::BootstrapCB() returned ", msg)
+    #clr.libc.free(msg)  # returned string need to be free-ed but in python causes coredump
+    del msg
+
+def main():
+    app_path = os.getcwd()
+    clr = coreclr.NetCore(app_path)
+    try:
+        demo0(clr)
+        demo1(clr)
+    finally:
+        clr.close()
 
 main()
