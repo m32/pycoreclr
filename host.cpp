@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
         // TRUSTED_PLATFORM_ASSEMBLIES
         tpa_list.c_str()
     };
-    std::cout << "tpa=" << tpa_list.c_str() << "=" << endl;
+    //std::cout << "tpa=" << tpa_list.c_str() << "=" << endl;
 
     void *coreclr_handle;
     unsigned int domain_id;

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import os
 import ctypes, ctypes.util
 import coreclr
@@ -14,14 +14,14 @@ def main():
     tpa = ':'.join(tpa)
     app_path = os.getcwd()
 
-    property_keys = [
-        "APP_PATHS",
-        "TRUSTED_PLATFORM_ASSEMBLIES",
-    ]
-    property_values = [
-        app_path,
-        tpa,
-    ]
+    property_keys = (
+        b"APP_PATHS",
+        b"TRUSTED_PLATFORM_ASSEMBLIES",
+    )
+    property_values = (
+        app_path.encode('utf-8'),
+        tpa.encode('utf-8'),
+    )
 
     b = ctypes.c_char_p * len(property_keys)
     cproperty_keys = b(*property_keys)
@@ -32,8 +32,8 @@ def main():
 
     print("Initializing CoreCLR...")
     ret = coreclr.coreclr_initialize(
-        app_path,                       # exePath
-        "host",                         # appDomainFriendlyName
+        app_path.encode('utf-8'),       # exePath
+        b"host",                        # appDomainFriendlyName
         len(property_values),           # propertyCount
         cproperty_keys,                 # propertyKeys
         cproperty_values,               # propertyValues
@@ -50,9 +50,9 @@ def main():
     ret = coreclr.coreclr_create_delegate(
         coreclr_handle,
         domain_id,
-        "manlib",
-        "ManLib",
-        "Bootstrap",
+        b"manlib",
+        b"ManLib",
+        b"Bootstrap",
         ctypes.byref(proc)
     )
     if ret < 0:

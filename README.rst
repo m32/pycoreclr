@@ -1,5 +1,11 @@
 Interop with Microsoft .NET Core runtime, called CoreCLR.
 
-Change location of coreclr to proper value in coreclr.py and makefile
+Change location of coreclr to proper value in makefile
 
-coredlltop = '/devel/bin/dotnet-2.1.105/shared/Microsoft.NETCore.App/2.0.7'
+DOTNET=/devel/bin/dotnet-sdk/shared/Microsoft.NETCore.App/2.2.4
+
+Python demo loading manlib.cs compiled to .dll:
+    python3 host.py
+
+C++ demo loading manlib.cs compiled to .dll:
+    make run
