@@ -2,7 +2,7 @@ import os
 from ctypes import *
 
 String = c_char_p
-coredlltop = '/devel/bin/dotnet-2.1.105/shared/Microsoft.NETCore.App/2.0.7'
+coredlltop = '-coredll-'
 libcoreclr = CDLL(os.path.join(coredlltop, 'libcoreclr.so'))
 
 coreclr_initialize = libcoreclr.coreclr_initialize
