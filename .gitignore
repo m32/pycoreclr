@@ -1,0 +1,6 @@
+bin/
+coreclr.py
+coreclrhost.h
+host
+manlib.dll
+obj/
