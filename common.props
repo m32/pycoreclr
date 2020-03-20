@@ -1,0 +1,12 @@
+<Project>
+    <PropertyGroup>
+        <VersionPrefix>1.2.3</VersionPrefix>
+        <VersionSuffix>abc</VersionSuffix>
+        <Authors>Grzegorz Makarewicz</Authors>
+        <Company>TriSoft Sp. z o.o.</Company>
+        <Copyright>TriSoft</Copyright>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <Version>1.0.0</Version>
+    </PropertyGroup>
+</Project>

@@ -1,4 +1,4 @@
-DOTNET=/devel/bin/dotnet-sdk/shared/Microsoft.NETCore.App/2.2.4
+DOTNET=/devel/bin/dotnet-sdk/shared/Microsoft.NETCore.App/3.1.2
 
 .PHONY: all run clean
 
