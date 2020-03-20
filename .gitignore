@@ -4,3 +4,4 @@ coreclrhost.h
 host
 manlib.dll
 obj/
+__pycache__/
