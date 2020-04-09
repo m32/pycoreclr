@@ -1,4 +1,4 @@
-DOTNET=/devel/bin/dotnet-sdk/shared/Microsoft.NETCore.App/3.1.2
+DOTNET=/devel/bin/dotnet-sdk/shared/Microsoft.NETCore.App/3.1.3
 
 .PHONY: all run clean
 
@@ -12,7 +12,7 @@ host: host.cpp coreclrhost.h
 
 manlib.dll : manlib.cs manlib.csproj
 	dotnet build
-	cp bin/Debug/netstandard2.0/$@ $@
+	cp bin/Debug/netstandard2.1/$@ $@
 
 coreclrhost.h : /devel/00mirror-cvs/00-dotnet/coreclr/src/coreclr/hosts/inc/coreclrhost.h
 	cp $< $@

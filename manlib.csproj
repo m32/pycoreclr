@@ -2,6 +2,6 @@
     <Import Project="common.props" />
     <PropertyGroup>
         <OutputType>library</OutputType>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 </Project>
