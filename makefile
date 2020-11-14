@@ -1,4 +1,4 @@
-DOTNET=/devel/bin/dotnet-sdk/shared/Microsoft.NETCore.App/3.1.3
+DOTNET:=$(shell ls -d -1 /devel/bin/dotnet-sdk/shared/Microsoft.NETCore.App/* | tail -1)
 HOSTINC=/devel/00mirror-cvs/00-dotnet/runtime/src/coreclr/src/hosts/inc
 
 .PHONY: all run clean
@@ -19,7 +19,10 @@ coreclrhost.h : $(HOSTINC)/coreclrhost.h
 	cp $< $@
 
 clean:
-	-rm -rf bin obj coreclrhost.h host manlib.dll *.pyc __pycache__ coreclr.py
+	-rm -rf bin obj host __pycache__
+
+distclean: clean
+	-rm coreclrhost.h coreclr.py manlib.dll
 
 coreclrhost.py: coreclrhost.h
 	ctypesgen -o coreclrhost.py -l libcoreclr coreclrhost.h
