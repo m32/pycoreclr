@@ -14,16 +14,16 @@ host: host.cpp coreclrhost.h
 
 manlib.dll : manlib.cs manlib.csproj
 	dotnet build
-	cp bin/Debug/netstandard2.1/$@ $@
+	cp bin/Debug/net6.0/$@ $@
 
-coreclrhost.h : $(HOSTINC)/coreclrhost.h
-	cp $< $@
+#coreclrhost.h : $(HOSTINC)/coreclrhost.h
+#	cp $< $@
 
 clean:
 	-rm -rf bin obj host __pycache__
 
 distclean: clean
-	-rm coreclrhost.h coreclr.py manlib.dll
+	-rm coreclr.py manlib.dll
 
 coreclrhost.py: coreclrhost.h
 	ctypesgen -o coreclrhost.py -l libcoreclr coreclrhost.h
