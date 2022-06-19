@@ -1,5 +1,6 @@
 DOTNET:=$(shell ls -d -1 /devel/bin/dotnet-sdk/shared/Microsoft.NETCore.App/* | tail -1)
 HOSTINC=/devel/00mirror-cvs/00-dotnet/runtime/src/coreclr/src/hosts/inc
+HOSTINC=/devel/00mirror-cvs/00-dotnet/runtime/src/coreclr/hosts/inc
 
 .PHONY: all run clean
 
