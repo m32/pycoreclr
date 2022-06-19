@@ -108,12 +108,6 @@ void AddFilesFromDirectoryToTpaList(const char* directory, std::string& tpaList)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
-    {
-        cerr << "Usage: host <core_clr_path>" << endl;
-        return -1;
-    }
-
     char app_path[PATH_MAX];
     if (realpath(argv[0], app_path) == NULL)
     {
@@ -130,7 +124,7 @@ int main(int argc, char *argv[])
     cout << "Loading CoreCLR..." << endl;
 
     char pkg_path[PATH_MAX];
-    if (realpath(argv[1], pkg_path) == NULL)
+    if (realpath(DOTNET, pkg_path) == NULL)
     {
         cerr << "bad path " << argv[1] << endl;
         return -1;

@@ -7,10 +7,10 @@ HOSTINC=/devel/00mirror-cvs/00-dotnet/runtime/src/coreclr/hosts/inc
 all: host manlib.dll coreclr.py
 
 run:
-	host $(DOTNET)
+	host
 
 host: host.cpp coreclrhost.h
-	g++ -o $@ $< -ldl
+	g++ -o $@ -D DOTNET='"$(DOTNET)"' $< -ldl
 
 manlib.dll : manlib.cs manlib.csproj
 	dotnet build
